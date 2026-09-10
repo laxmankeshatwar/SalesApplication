@@ -1,7 +1,9 @@
 namespace SalesApi.Models;
 
-public record Sale(int Id, string Product, int Quantity, decimal Price, DateTime Date);
-
-public record SaleCreate(string Product, int Quantity, decimal Price, DateTime Date);
-
-public record SaleUpdate(string Product, int Quantity, decimal Price, DateTime Date);
+public class Sale
+{
+    public int Id { get; set; }
+    public string ProductName { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public DateTime SaleDate { get; set; }
+}
