@@ -1,0 +1,43 @@
+name: Deploy Sales Importer Function
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'SalesImporter/**'
+
+  workflow_dispatch:
+
+env:
+  AZURE_FUNCTIONAPP_NAME: SalesImporter
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore SalesImporter/SalesImporter/SalesImporter.csproj
+
+      - name: Build
+        run: dotnet build SalesImporter/SalesImporter/SalesImporter.csproj --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish SalesImporter/SalesImporter/SalesImporter.csproj --configuration Release --output ./publish
+
+      - name: Deploy to Azure Function App
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+          package: ./publish
